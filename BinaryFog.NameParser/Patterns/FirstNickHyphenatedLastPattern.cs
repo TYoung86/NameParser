@@ -7,7 +7,7 @@ namespace BinaryFog.NameParser.Patterns {
 	[UsedImplicitly]
 	public class FirstNickHyphenatedLastPattern : IFullNamePattern {
 		private static readonly Regex Rx = new Regex(
-			@"^" + First + OptionalSpace + Nick + OptionalSpace + LastHyphenated + @"$",
+			@"^" + First + Space + Nick + Space + LastHyphenated + MaybeSuffixAndOrPostNominal + @"$",
 			CommonPatternRegexOptions);
 
 		public ParsedFullName Parse(string rawName) {
@@ -30,7 +30,8 @@ namespace BinaryFog.NameParser.Patterns {
 				FirstName = firstName,
 				NickName = nickName,
 				LastName = $"{lastPart1}-{lastPart2}",
-				DisplayName = $"{firstName} {lastPart1}-{lastPart2}",
+				DisplayName = $"{firstName} {lastPart1}-{lastPart2}",
+				Suffix = GetSuffixCaptures(match),
 				Score = 75 + scoreMod
 			};
 			return pn;

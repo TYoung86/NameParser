@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using static BinaryFog.NameParser.NameComponentSets;
@@ -7,7 +8,7 @@ namespace BinaryFog.NameParser.Patterns {
 	[UsedImplicitly]
 	public class FirstHyphenatedLastNickPattern : IFullNamePattern {
 		private static readonly Regex Rx = new Regex(
-			@"^" + First + Space + LastHyphenated + OptionalSpace + Nick + @"$",
+			@"^" + First + Space + LastHyphenated + Space + Nick + MaybeSuffixAndOrPostNominal + @"$",
 			CommonPatternRegexOptions);
 
 		public ParsedFullName Parse(string rawName) {
@@ -31,6 +32,7 @@ namespace BinaryFog.NameParser.Patterns {
 				LastName = lastName,
 				NickName = nickName,
 				DisplayName = $"{firstName} {lastName}",
+				Suffix = GetSuffixCaptures(match),
 				Score = 0 + scoreMod
 			};
 			return pn;

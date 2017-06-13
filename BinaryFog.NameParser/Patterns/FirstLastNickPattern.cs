@@ -7,7 +7,7 @@ namespace BinaryFog.NameParser.Patterns {
 	[UsedImplicitly]
 	public class FirstLastNickPattern : IFullNamePattern {
 		private static readonly Regex Rx = new Regex(
-			@"^" + First + Space + Last + OptionalSpace + Nick + @"$",
+			@"^" + First + Space + Last + Space + Nick + MaybeSuffixAndOrPostNominal + @"$",
 			CommonPatternRegexOptions);
 
 		public ParsedFullName Parse(string rawName) {
@@ -27,7 +27,8 @@ namespace BinaryFog.NameParser.Patterns {
 				FirstName = firstName,
 				LastName = lastName,
 				NickName = nickName,
-				DisplayName = $"{firstName} {lastName}",
+				DisplayName = $"{firstName} {lastName}",
+				Suffix = GetSuffixCaptures(match),
 				Score = 0 + scoreMod
 			};
 			return pn;

@@ -28,6 +28,8 @@ namespace BinaryFog.NameParser.Patterns {
 				FirstName = firstName,
 				LastName = lastName,
 				DisplayName = $"{firstName} {lastName}",
+
+				Suffix = GetSuffixCaptures(match),
 				Score = 100 + scoreMod
 			};
 			return pn;

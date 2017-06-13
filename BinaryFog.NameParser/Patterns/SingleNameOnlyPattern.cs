@@ -7,7 +7,7 @@ namespace BinaryFog.NameParser.Patterns {
 	[UsedImplicitly]
 	public class SingleNameOnlyPattern : IFullNamePattern {
 		private static readonly Regex Rx = new Regex(
-			@"^" + First + @"$",
+			@"^" + First + MaybeSuffixAndOrPostNominal + @"$",
 			CommonPatternRegexOptions);
 
 
@@ -16,6 +16,8 @@ namespace BinaryFog.NameParser.Patterns {
 			if (!match.Success) return null;
 			var pn = new ParsedFullName {
 				DisplayName = rawName,
+
+				Suffix = GetSuffixCaptures(match),
 				Score = 50
 			};
 

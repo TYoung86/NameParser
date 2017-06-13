@@ -7,7 +7,7 @@ namespace BinaryFog.NameParser.Patterns {
 	[UsedImplicitly]
 	public class TitleFirstIrishLastPattern : IFullNamePattern {
 		private static readonly Regex Rx = new Regex(
-			@"^" + Title + Space + First + Space + @"(?<irishPrefix>O'|Mc|Mac)" + Last + @"$",
+			@"^" + Title + Space + First + Space + @"(?<irishPrefix>O'|Mc|Mac)" + Last + MaybeSuffixAndOrPostNominal + @"$",
 			CommonPatternRegexOptions);
 
 		public ParsedFullName Parse(string rawName) {
@@ -28,6 +28,8 @@ namespace BinaryFog.NameParser.Patterns {
 				FirstName = firstName,
 				LastName = lastName,
 				DisplayName = $"{firstName} {lastName}",
+
+				Suffix = GetSuffixCaptures(match),
 				Score = 300 + scoreMod
 			};
 

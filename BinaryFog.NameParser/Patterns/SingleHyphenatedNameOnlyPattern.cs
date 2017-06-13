@@ -7,7 +7,7 @@ namespace BinaryFog.NameParser.Patterns {
 	[UsedImplicitly]
 	public class SingleHyphenatedNameOnlyPattern : IFullNamePattern {
 		private static readonly Regex Rx = new Regex(
-			@"^" + LastHyphenated + @"$",
+			@"^" + LastHyphenated + MaybeSuffixAndOrPostNominal + @"$",
 			CommonPatternRegexOptions);
 
 
@@ -27,6 +27,7 @@ namespace BinaryFog.NameParser.Patterns {
 			var pn = new ParsedFullName {
 				LastName = lastName,
 				DisplayName = lastName,
+				Suffix = GetSuffixCaptures(match),
 				Score = 50 + scoreMod
 			};
 

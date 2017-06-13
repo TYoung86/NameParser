@@ -27,6 +27,8 @@ namespace BinaryFog.NameParser.Patterns {
 				FirstName = $"{firstName1}-{firstName2}",
 				LastName = lastName,
 				DisplayName = $"{firstName1}-{firstName2} {lastName}",
+
+				Suffix = GetSuffixCaptures(match),
 				Score = 200 + scoreMod
 			};
 			return pn;

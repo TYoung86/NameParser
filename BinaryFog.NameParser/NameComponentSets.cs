@@ -47,9 +47,10 @@ namespace BinaryFog.NameParser {
 		/// <param name="dictionary">A given dictionary to match against.</param>
 		/// <param name="score">The score to adjust.</param>
 		/// <param name="name">The name to attempt to match.</param>
-		/// <param name="value">The value to adjust the score by if matched by the given dictionary.</param>
-		internal static void ModifyScore(ISet<string> dictionary, ref int score, string name, int value) {
-			if (dictionary.Contains(name)) score += value;
+		/// <param name="matchValue">The value to adjust the score by if matched by the given dictionary.</param>
+		internal static void ModifyScore(ISet<string> dictionary, ref int score, string name, int matchValue, int noMatchValue) {
+			if (dictionary.Contains(name)) score += matchValue;
+			else score += noMatchValue;
 		}
 
 		/// <summary>
@@ -60,8 +61,8 @@ namespace BinaryFog.NameParser {
 		/// <param name="matchedFirstValue">The value to adjust the score by if matched by the first name dictionary.</param>
 		/// <param name="matchedLastValue">The value to adjust the score by if matched by the last name dictionary.</param>
 		internal static void ModifyScore(ref int score, string name, int matchedFirstValue, int matchedLastValue) {
-			ModifyScore(FirstNames, ref score, name, matchedFirstValue);
-			ModifyScore(FirstNames, ref score, name, matchedLastValue);
+			ModifyScore(FirstNames, ref score, name, matchedFirstValue, 0);
+			ModifyScore(FirstNames, ref score, name, matchedLastValue, 0);
 		}
 
 		/// <summary>
@@ -151,8 +152,8 @@ namespace BinaryFog.NameParser {
 		/// <param name="name">The name to attempt to match.</param>
 		/// <param name="value">The value to adjust the score by if matched.</param>
 		internal static void ModifyScoreExpectedFirstName(ref int score, string name, int value = 25) {
-			ModifyScore(FirstNames, ref score, name, value);
-			ModifyScore(LastNames, ref score, name, -value);
+			ModifyScore(FirstNames, ref score, name, value, 0);
+			ModifyScore(LastNames, ref score, name, -value, value/5);
 		}
 
 		/// <summary>
@@ -163,8 +164,8 @@ namespace BinaryFog.NameParser {
 		/// <param name="name">The name to attempt to match.</param>
 		/// <param name="value">The value to adjust the score by if matched.</param>
 		internal static void ModifyScoreExpectedLastName(ref int score, string name, int value = 25) {
-			ModifyScore(LastNames, ref score, name, value);
-			ModifyScore(FirstNames, ref score, name, -value);
+			ModifyScore(LastNames, ref score, name, value, 0);
+			ModifyScore(FirstNames, ref score, name, -value, value/5);
 		}
 	}
 }

@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -41,7 +43,7 @@ namespace BinaryFog.NameParser {
 		}
 
 		public static readonly string LastNamePrefixes = RegexPipeJoin(Resources.LastNamePrefixes);
-		public static readonly string PostNominals = RegexPipeJoin(Resources.PostNominals); // TODO: make use
+		public static readonly string PostNominals = RegexPipeJoin(Resources.PostNominals);
 		public static readonly string JobTitles = RegexPipeJoin(Resources.JobTitles);
 		public static readonly string Suffixes = RegexPipeJoin(Resources.Suffixes);
 		public static readonly string Titles = RegexPipeJoin(Resources.Titles);
@@ -51,20 +53,25 @@ namespace BinaryFog.NameParser {
 		public static readonly string JobTitle = @"(?<jobTitle>" + JobTitles + @")";
 
 		public static readonly string Title = @"(?<title>(" + Titles + @")((?!\s)\W)?)";
-
-		//public static readonly string Suffix = @"(?<suffix>((" + Suffixes + @")((?!\s)\W)?)([\s]*(?<=[\s\W]+)(" + PostNominals + @")((?!\s)\W)?)*?|([\s]*(?<=[\s\W]+)(" + PostNominals + @")((?!\s)\W)?))";
-
+		
 		public static readonly string Suffix = @"(?<suffix>(" + Suffixes + @")((?!\s)\W)?)";
+
+		public static readonly string PostNominal = @"(?<suffix>((?<=\W)(" + PostNominals + @")[\W^\s]?\s*?)+)";
+
+		public static readonly string MaybeSuffixAndOrPostNominal = @"(" + OptionalCommaSpace + Suffix + @"?" + @"(" + Space + PostNominal + @")?)?";
 
 		public static readonly string Prefix = @"(?<prefix>" + LastNamePrefixes + @")";
 
-		public const string Space = @"(\s+|(?<!\w)\s*)";
-		public const string OptionalSpace = @"((?<=\W)\s*|\s*(?=\W)|(?<!\W)\s+)?";
+		public const string Space = @"(\s+|(?<=\W)\s*|\s*(?=\W))";
+		
+		// require a space if the previous or next character is a word character
+		public const string OptionalSpace = @"\s*?";
+
 		public const string OptionalCommaSpace = @"(" + OptionalSpace + @",)?" + Space;
 		public const string CommaSpace = OptionalSpace + @"," + Space;
 		public const string Initial = @"(?<initial>[a-z])\.?";
 		public const string Vowels = @"[aeiouy]";
-		public const string TwoInitial = @"(?<initial1>[a-z])(?!"+Vowels+@")\.?" + OptionalSpace + @"(?<initial2>[a-z])\.?";
+		public const string TwoInitial = @"(?<initial1>[a-z])(?!"+Vowels+@")\.?" + Space + @"(?<initial2>[a-z])\.?";
 		public const string Name = @"'?(\w+|\w+('\w+)+)('(?=\W))?";
 		public const string First = @"(?<first>"+Name+@")";
 		public const string Last = @"(?<last>"+Name+@")";
@@ -84,5 +91,11 @@ namespace BinaryFog.NameParser {
 			| RegexOptions.Singleline
 			| RegexOptions.CultureInvariant
 			| RegexOptions.ExplicitCapture;
+
+		public static string GetSuffixCaptures(Match match)
+			=> match.Groups["suffix"].Captures.Count > 0 ?
+				string.Join(" ", match.Groups["suffix"]
+					.Captures.Cast<Capture>()
+					.Select(c => c.Value)) : null;
 	}
 }

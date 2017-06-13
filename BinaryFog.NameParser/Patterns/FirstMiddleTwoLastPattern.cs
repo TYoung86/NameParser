@@ -29,7 +29,9 @@ namespace BinaryFog.NameParser.Patterns {
 				MiddleName = middleName,
 				LastName = $"{lastPart1} {lastPart2}",
 				DisplayName = $"{firstName} {middleName} {lastPart1} {lastPart2}",
-				Score = 50 + scoreMod
+
+				Suffix = GetSuffixCaptures(match),
+				Score = 20 + scoreMod
 			};
 			return pn;
 		}

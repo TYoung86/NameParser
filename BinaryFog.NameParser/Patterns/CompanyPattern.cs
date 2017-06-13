@@ -14,7 +14,7 @@ namespace BinaryFog.NameParser.Patterns {
 			var match = Rx.Match(rawName);
 			if (!match.Success) return null;
 			var pn = new ParsedFullName {
-				DisplayName = rawName,
+				DisplayName = rawName,
 				Score = ParsedFullName.MaxScore
 			};
 

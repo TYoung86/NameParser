@@ -23,6 +23,7 @@ namespace BinaryFog.NameParser.Patterns {
 				FirstName = firstName,
 
 				DisplayName = $"{firstName} {jobTitle}",
+				Suffix = GetSuffixCaptures(match),
 				Score = 200 + scoreMod
 			};
 			return pn;
