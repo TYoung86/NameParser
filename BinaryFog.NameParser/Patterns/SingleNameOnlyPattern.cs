@@ -6,6 +6,7 @@ using static BinaryFog.NameParser.NameComponentSets;
 namespace BinaryFog.NameParser.Patterns {
 	[UsedImplicitly]
 	public class SingleNameOnlyPattern : IFullNamePattern {
+		Regex IFullNamePattern.Rx => Rx;
 		private static readonly Regex Rx = new Regex(
 			@"^" + First + MaybeSuffixAndOrPostNominal + @"$",
 			CommonPatternRegexOptions);
@@ -14,11 +15,12 @@ namespace BinaryFog.NameParser.Patterns {
 		public ParsedFullName Parse(string rawName) {
 			var match = Rx.Match(rawName);
 			if (!match.Success) return null;
+			int scoreMod = 0;
 			var pn = new ParsedFullName {
 				DisplayName = rawName,
 
-				Suffix = GetSuffixCaptures(match),
-				Score = 50
+				Suffix = GetSuffixCapturesAndScore(ref scoreMod, match),
+				Score = 50 + scoreMod
 			};
 
 			var matchedName = match.Groups["first"].Value;

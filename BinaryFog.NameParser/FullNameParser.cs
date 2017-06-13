@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Loader;
+using System.Text.RegularExpressions;
 using JetBrains.Annotations;
-using Microsoft.Extensions.PlatformAbstractions;
+
 
 namespace BinaryFog.NameParser {
 	using static Helpers;
+	using static TaskManager;
 
 	/// <summary>
 	/// Parse a person full name 
@@ -27,6 +27,7 @@ namespace BinaryFog.NameParser {
 	/// 1. The prefix "ATTN:" is removed if exists and the parsing proceeds on the new string
 	/// </remarks>
 	public class FullNameParser {
+
 		public IReadOnlyList<ParsedFullName> Results { get; set; } = new ParsedFullName[0];
 
 		protected string FullName { get; private set; }
@@ -45,7 +46,7 @@ namespace BinaryFog.NameParser {
 		}
 
 		private static void BuildPatternsMap() {
-			PatternsMap = (_enableThirdParty
+			var patternTypes = (_enableThirdParty
 					? KnownAssemblies
 						.Where(a
 							=> !a.FullName.StartsWith("System.")
@@ -53,9 +54,14 @@ namespace BinaryFog.NameParser {
 						.SelectMany(s => TryOrDefault(s.GetExportedTypes, Type.EmptyTypes))
 					: typeof(FullNameParser).GetTypeInfo().Assembly.GetExportedTypes()
 				)
-				.Where(p => PatternType.IsAssignableFrom(p))
-				.Select(t => t.GetConstructor(Type.EmptyTypes)?.Invoke(null))
-				.OfType<IFullNamePattern>();
+				.Where(p => PatternType.IsAssignableFrom(p)).ToList();
+			var previousCacheSize = Regex.CacheSize;
+			var patternCount = patternTypes.Count;
+			Regex.CacheSize = Math.Max(previousCacheSize, patternCount + 8);
+			PatternsMap = Schedule(patternTypes, t =>
+					(IFullNamePattern) t.GetConstructor(Type.EmptyTypes)?.Invoke(null))
+				.Where(NotNull);
+			PatternsCount = patternCount;
 		}
 
 		static FullNameParser() {
@@ -63,6 +69,7 @@ namespace BinaryFog.NameParser {
 		}
 
 		protected static IEnumerable<IFullNamePattern> PatternsMap { get; private set; }
+		protected static int PatternsCount { get; private set; }
 
 
 		public string FirstName { get; private set; }
@@ -96,12 +103,10 @@ namespace BinaryFog.NameParser {
 				return;
 
 			Preparse();
-
-			Results = PatternsMap
-				.Select(pattern => pattern.Parse(FullName))
-				.Where(NotNull)
-				.OrderByDescending(result => result?.Score ?? 0)
-				.ToImmutableArray();
+			
+			Results = Schedule(PatternsMap, pattern => pattern.Parse(FullName))
+					.OrderByDescending(result => result?.Score ?? 0)
+					.ToImmutableArray();
 
 			var selectedResult = Results.FirstOrDefault();
 
@@ -119,7 +124,8 @@ namespace BinaryFog.NameParser {
 		/// </summary>
 		protected void Preparse() {
 			if (FullName.StartsWith("ATTN:", StringComparison.OrdinalIgnoreCase))
-				FullName = FullName.Substring(5).Trim();
+				FullName = FullName.Substring(5);
+			FullName = FullName.Trim();
 		}
 	}
 }

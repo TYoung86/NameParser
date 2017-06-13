@@ -91,11 +91,14 @@ namespace BinaryFog.NameParser {
 			| RegexOptions.Singleline
 			| RegexOptions.CultureInvariant
 			| RegexOptions.ExplicitCapture;
-
-		public static string GetSuffixCaptures(Match match)
-			=> match.Groups["suffix"].Captures.Count > 0 ?
-				string.Join(" ", match.Groups["suffix"]
-					.Captures.Cast<Capture>()
-					.Select(c => c.Value)) : null;
+		
+		public static string GetSuffixCapturesAndScore(ref int scoreMod, Match match, int valueEach = 25) {
+			var count = match.Groups["suffix"].Captures.Count;
+			if (count <= 0) return null;
+			scoreMod += valueEach * count;
+			return string.Join(" ", match.Groups["suffix"]
+				.Captures.Cast<Capture>()
+				.Select(c => c.Value));
+		}
 	}
 }

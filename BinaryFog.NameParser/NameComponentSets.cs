@@ -31,14 +31,14 @@ namespace BinaryFog.NameParser {
 		[SuppressMessage("ReSharper", "InconsistentNaming")] private static readonly ImmutableHashSet<string> _femaleFirstNames =
 			ReadLines(Resources.FemaleFirstNames).ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
 
-		public static readonly ISet<string> MaleFirstNames = _maleFirstNames;
-		public static readonly ISet<string> FemaleFirstNames = _femaleFirstNames;
+		public static readonly ImmutableHashSet<string> MaleFirstNames = _maleFirstNames;
+		public static readonly ImmutableHashSet<string> FemaleFirstNames = _femaleFirstNames;
 
 
-		public static readonly ISet<string> FirstNames =
+		public static readonly ImmutableHashSet<string> FirstNames =
 			_maleFirstNames.Union(_femaleFirstNames);
 
-		public static readonly ISet<string> LastNames =
+		public static readonly ImmutableHashSet<string> LastNames =
 			ReadLines(Resources.LastNames).ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
 
 		/// <summary>
@@ -62,7 +62,7 @@ namespace BinaryFog.NameParser {
 		/// <param name="matchedLastValue">The value to adjust the score by if matched by the last name dictionary.</param>
 		internal static void ModifyScore(ref int score, string name, int matchedFirstValue, int matchedLastValue) {
 			ModifyScore(FirstNames, ref score, name, matchedFirstValue, 0);
-			ModifyScore(FirstNames, ref score, name, matchedLastValue, 0);
+			ModifyScore(LastNames, ref score, name, matchedLastValue, 0);
 		}
 
 		/// <summary>
@@ -84,24 +84,21 @@ namespace BinaryFog.NameParser {
 		/// <param name="name2">The name to attempt to match as the same gender as the first.</param>
 		/// <param name="value">The value to adjust the score by if matched.</param>
 		internal static void ModifyScoreExpectedFirstNames(ref int score, string name1, string name2, int value = 10) {
-			if (MaleFirstNames.Contains(name1)) {
-				if (!FemaleFirstNames.Contains(name1))
-					score += value;
-				if (MaleFirstNames.Contains(name2)) {
-					if (!FemaleFirstNames.Contains(name2))
-						score += value;
-				}
+			var names = new[] {name1, name2};
+			var maleNames = MaleFirstNames.Intersect(names);
+			var femaleNames = FemaleFirstNames.Intersect(names);
+			var maleOnlyNames = maleNames.Except(femaleNames);
+			var femaleOnlyNames = femaleNames.Except(maleNames);
+			var countSum = maleOnlyNames.Count + femaleOnlyNames.Count;
+			if (countSum != 0) {
+				score += maleOnlyNames.Count == 0
+					|| femaleOnlyNames.Count == 0
+					? value * countSum * 2
+					: value * countSum;
 			}
-			if (FemaleFirstNames.Contains(name1)) {
-				if (!MaleFirstNames.Contains(name1))
-					score += value;
-				if (FemaleFirstNames.Contains(name2)) {
-					if (!MaleFirstNames.Contains(name2))
-						score += value;
-				}
-			}
-			if (LastNames.Contains(name1)) score -= value;
-			if (LastNames.Contains(name2)) score -= value;
+
+			var lastNames = LastNames.Intersect(names);
+			score += -value * lastNames.Count;
 		}
 
 		/// <summary>
@@ -115,33 +112,21 @@ namespace BinaryFog.NameParser {
 		/// <param name="name3">Another name to attempt to match as the same gender as the first.</param>
 		/// <param name="value">The value to adjust the score by if matched.</param>
 		internal static void ModifyScoreExpectedFirstNames(ref int score, string name1, string name2, string name3, int value = 10) {
-			if (MaleFirstNames.Contains(name1)) {
-				if (!FemaleFirstNames.Contains(name1))
-					score += value;
-				if (MaleFirstNames.Contains(name2)) {
-					if (!FemaleFirstNames.Contains(name2))
-						score += value;
-					if (MaleFirstNames.Contains(name3)) {
-						if (!FemaleFirstNames.Contains(name3))
-							score += value;
-					}
-				}
+			var names = new[] {name1, name2, name3};
+			var maleNames = MaleFirstNames.Intersect(names);
+			var femaleNames = FemaleFirstNames.Intersect(names);
+			var maleOnlyNames = maleNames.Except(femaleNames);
+			var femaleOnlyNames = femaleNames.Except(maleNames);
+			var countSum = maleOnlyNames.Count + femaleOnlyNames.Count;
+			if (countSum != 0) {
+				score += maleOnlyNames.Count == 0
+						|| femaleOnlyNames.Count == 0
+					? value * countSum * 2
+					: value * countSum;
 			}
-			if (FemaleFirstNames.Contains(name1)) {
-				if (!MaleFirstNames.Contains(name1))
-					score += value;
-				if (FemaleFirstNames.Contains(name2)) {
-					if (!MaleFirstNames.Contains(name2))
-						score += value;
-					if (FemaleFirstNames.Contains(name3)) {
-						if (!MaleFirstNames.Contains(name3))
-							score += value;
-					}
-				}
-			}
-			if (LastNames.Contains(name1)) score -= value;
-			if (LastNames.Contains(name2)) score -= value;
-			if (LastNames.Contains(name3)) score -= value;
+
+			var lastNames = LastNames.Intersect(names);
+			score += -value * lastNames.Count;
 		}
 
 		/// <summary>

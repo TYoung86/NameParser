@@ -6,6 +6,7 @@ using static BinaryFog.NameParser.NameComponentSets;
 namespace BinaryFog.NameParser.Patterns {
 	[UsedImplicitly]
 	public class TitleHyphenatedFirstLastPattern : IFullNamePattern {
+		Regex IFullNamePattern.Rx => Rx;
 		private static readonly Regex Rx = new Regex(
 			@"^" + Title + Space + @"(?<first1>" + Name + @")-(?<first2>" + Name + @")" + Space + @"(?<last>" + Name + @")$",
 			CommonPatternRegexOptions);
@@ -28,7 +29,7 @@ namespace BinaryFog.NameParser.Patterns {
 				LastName = lastName,
 				DisplayName = $"{firstName1}-{firstName2} {lastName}",
 
-				Suffix = GetSuffixCaptures(match),
+				Suffix = GetSuffixCapturesAndScore(ref scoreMod, match),
 				Score = 200 + scoreMod
 			};
 			return pn;

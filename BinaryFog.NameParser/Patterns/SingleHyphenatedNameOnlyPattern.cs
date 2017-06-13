@@ -6,6 +6,7 @@ using static BinaryFog.NameParser.NameComponentSets;
 namespace BinaryFog.NameParser.Patterns {
 	[UsedImplicitly]
 	public class SingleHyphenatedNameOnlyPattern : IFullNamePattern {
+		Regex IFullNamePattern.Rx => Rx;
 		private static readonly Regex Rx = new Regex(
 			@"^" + LastHyphenated + MaybeSuffixAndOrPostNominal + @"$",
 			CommonPatternRegexOptions);
@@ -27,7 +28,7 @@ namespace BinaryFog.NameParser.Patterns {
 			var pn = new ParsedFullName {
 				LastName = lastName,
 				DisplayName = lastName,
-				Suffix = GetSuffixCaptures(match),
+				Suffix = GetSuffixCapturesAndScore(ref scoreMod, match),
 				Score = 50 + scoreMod
 			};
 

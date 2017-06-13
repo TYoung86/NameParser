@@ -6,6 +6,7 @@ using static BinaryFog.NameParser.NameComponentSets;
 namespace BinaryFog.NameParser.Patterns {
 	[UsedImplicitly]
 	public class TitleFirstInitialLastPattern : IFullNamePattern {
+		Regex IFullNamePattern.Rx => Rx;
 		private static readonly Regex Rx = new Regex(
 			@"^" + Title + Space + First + Space + Initial + Space + Last + MaybeSuffixAndOrPostNominal + @"$",
 			CommonPatternRegexOptions);
@@ -30,8 +31,8 @@ namespace BinaryFog.NameParser.Patterns {
 				LastName = lastName,
 				DisplayName = $"{firstName} {middleName} {lastName}",
 
-				Suffix = GetSuffixCaptures(match),
-				Score = 100 + scoreMod
+				Suffix = GetSuffixCapturesAndScore(ref scoreMod, match),
+				Score = 125 + scoreMod
 			};
 			return pn;
 		}

@@ -1,4 +1,6 @@
-﻿namespace BinaryFog.NameParser {
+﻿using System.Text.RegularExpressions;
+
+namespace BinaryFog.NameParser {
 	/// <summary>
 	/// Implement this interface if you wish for your name parser pattern
 	/// to be automatically discovered and used by the <see cref="FullNameParser"/>.
@@ -8,6 +10,9 @@
 	/// Feel free to submit your patterns upstream to the repository or create a separate pattern library.
 	/// </summary>
 	public interface IFullNamePattern {
+
+		Regex Rx { get; }
+
 		/// <summary>
 		/// Attempt to parse a name through the pattern.
 		/// </summary>

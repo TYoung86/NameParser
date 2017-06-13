@@ -5,6 +5,7 @@ using static BinaryFog.NameParser.RegexNameComponents;
 namespace BinaryFog.NameParser.Patterns {
 	[UsedImplicitly]
 	public class CompanyPattern : IFullNamePattern {
+		Regex IFullNamePattern.Rx => Rx;
 		private static readonly Regex Rx = new Regex(
 			Space + @"(?<lastWord>(" + CompanySuffixes + @")\W?)$",
 			CommonPatternRegexOptions);
