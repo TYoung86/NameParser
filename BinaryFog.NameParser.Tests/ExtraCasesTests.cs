@@ -306,6 +306,19 @@ namespace BinaryFog.NameParser.Tests {
 			Assert.Equal("Tammy Lee van Baker", target.DisplayName);
 		}
 		 
+		 
+		[Fact]
+		public void FirstMiddlePrefixedLastSuffixPostNominal() {
+			var fullName = "Tammy Lee van Baker II Esq.";
+			var target = new FullNameParser(fullName);
+			target.Parse();
+			
+			Assert.Equal("Tammy", target.FirstName);
+			Assert.Equal("Lee", target.MiddleName);
+			Assert.Equal("van Baker", target.LastName);
+			Assert.Equal("Tammy Lee van Baker", target.DisplayName);
+		}
+		 
 		[Fact]
 		public void FirstNickHyphenatedLast() {
 			var fullName = "Manuel \"Manny\" Esquipulas-Sohom";

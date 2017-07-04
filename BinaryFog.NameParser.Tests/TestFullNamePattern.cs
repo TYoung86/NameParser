@@ -1,5 +1,8 @@
-﻿namespace BinaryFog.NameParser.Tests {
+﻿using System.Text.RegularExpressions;
+
+namespace BinaryFog.NameParser.Tests {
 	public class TestFullNamePattern : IFullNamePattern {
+		Regex IFullNamePattern.Rx => null;
 		public ParsedFullName Parse(string rawName)
 			=> rawName == "EXAMPLE"
 				? new ParsedFullName {

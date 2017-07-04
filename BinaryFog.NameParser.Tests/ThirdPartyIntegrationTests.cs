@@ -6,7 +6,7 @@ using Xunit;
 namespace BinaryFog.NameParser.Tests {
 	public class ThirdPartyIntegrationTests {
 		[Fact]
-		public void FirstMiddlePrefixedLastSuffix() {
+		public void ThirdPartyIntegrationTest() {
 			var fullName = "EXAMPLE";
 			var target = new FullNameParser(fullName);
 
